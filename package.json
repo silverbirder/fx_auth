@@ -1,5 +1,5 @@
 {
-  "name": "fx_auth",
+  "name": "fx_ea",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,6 +9,7 @@
   "author": "shibamoto",
   "license": "ISC",
   "dependencies": {
-    "@google-cloud/datastore": "^1.4.2"
+    "@google-cloud/datastore": "^1.4.2",
+    "request": "^2.88.0"
   }
 }
