@@ -1,14 +1,15 @@
 const NOT_FOUND = 404;
 const OK = 200;
+const URL = "";
 
 exports.auth = function auth(req, res) {
-    var AccountNumber = parseInt(req.query['AccountNumber']);
+    var AccountNumber = parseInt(req.body['an']);
     if (isNaN(AccountNumber)) {
         res.sendStatus(NOT_FOUND).end();
         return;
     }
     getEntity(AccountNumber).then(function(entity) {
-      var status = entity.length != 0 ? OK: NOT_FOUND;
+      var status = entity[0].length != 0 ? OK: NOT_FOUND;
       res.sendStatus(status).end();
     }).catch(function(){
       res.sendStatus(NOT_FOUND).end();
@@ -17,44 +18,73 @@ exports.auth = function auth(req, res) {
 }
 
 exports.slack = function slack(req, res) {
-  var Money = parseInt(req.query['Money']);
-  if (isNaN(Money)) {
-    res.sendStatus(404).end();
-    return;
-  }
-  var AccountNumber = parseInt(req.query['AccountNumber']);
+  var AccountNumber = parseInt(req.body['an']);
   if (isNaN(AccountNumber)) {
       res.sendStatus(404).end();
       return;
   }
   getEntity(AccountNumber).then(function(entity) {
-    if (entity.length == 0) {
+    if (entity[0].length == 0) {
       res.sendStatus(404).end();
       return;
     }
-  
-    var NowYMD = getNowYMD();
-    var request = require('request');
-    var url = "";
-    var text = "["+NowYMD+"]\n"+entity[0]['Name']+":"+Money;
-    var options = {
-      uri: url,
-      headers: {
-        "Content-type": "application/json",
-      },
-      json: {
-        "channel": "#prj-fx-ea",
-        "username": "maa-bot",
-        "icon_emoji": ":moneybag:",
-        "text": text
-      }
-    };
-    request.post(options, function(error, response, body){});
-    res.sendStatus(200).end();
+    saveEntity(req.body).then(function() {
+      var profit = req.body['pr'];
+      var NowYMD = getNowYMD();
+      var request = require('request');
+      var url = URL;
+      var text = "["+NowYMD+"]:"+entity[0][0]['Name']+"\n"+profit;
+      var options = {
+        uri: url,
+        headers: {
+          "Content-type": "application/json",
+        },
+        json: {
+          "channel": "#prj-fx-ea",
+          "username": "maa-bot",
+          "icon_emoji": ":moneybag:",
+          "text": text
+        }
+      };
+      request.post(options, function(error, response, body){});
+      res.sendStatus(200).end();
+
+      }).catch(function(){
+        res.sendStatus(404).end();
+        return;
+      });
     }).catch(function(){
       res.sendStatus(404).end();
       return;
     });
+}
+function saveEntity(data) {
+  datastore = require('@google-cloud/datastore')({
+    projectId: 'ma-web-tools'
+  });
+  var ex_data = {
+    message: data['ms'],
+    profit: data['pr'],
+    swap  : data['sw'],
+    commission: data['co'],
+    openPrice: data['op'],
+    openTime: data['ot'],
+    closePrice: data['cp'],
+    closeTime: data['ct'],
+    expiration: data['ex'],
+    symbol: data['sy'],
+    lots: data['lo'],
+    stopLoss: data['sl'],
+    takeProfit: data['tp'],
+    ticket: data['ti'],
+    type: data['ty'],
+    balance: data['ba'],
+    accountNumber: data['an']
+  }
+  return datastore.save({
+    key: datastore.key('FxData'),
+    data: ex_data
+  });
 }
 
 function getEntity(AccountNumber) {
@@ -66,15 +96,8 @@ function getEntity(AccountNumber) {
   .filter('AccountNumber', '=', AccountNumber)
   .filter('Invalid', '=', false)
   .limit(1);
-  return new Promise(function(reslove, reject){
-    q.run(function(err, entities, info){
-      if(err) {
-        reject(err);
-        return;
-      };
-      reslove(entities);
-    })
-  }); 
+
+  return datastore.runQuery(q);
 }
 
 function getNowYMD(){
