@@ -1,0 +1,10 @@
+indexes:
+
+- kind: FxData
+  properties:
+  - name: accountNumber
+  - name: ticket
+  - name: openTime
+  - name: closeTime
+  - name: symbol
+    direction: desc

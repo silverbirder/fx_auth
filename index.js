@@ -33,7 +33,7 @@ exports.slack = function slack(req, res) {
       var NowYMD = getNowYMD();
       var request = require('request');
       var url = URL;
-      var text = "["+NowYMD+"]:"+entity[0][0]['Name']+"\n"+profit;
+      var text = "["+NowYMD+"]:"+entity[0][0]['Name']+"\n"+parseFloat(profit);
       var options = {
         uri: url,
         headers: {
@@ -64,22 +64,22 @@ function saveEntity(data) {
   });
   var ex_data = {
     message: data['ms'],
-    profit: data['pr'],
-    swap  : data['sw'],
-    commission: data['co'],
-    openPrice: data['op'],
-    openTime: data['ot'],
-    closePrice: data['cp'],
-    closeTime: data['ct'],
-    expiration: data['ex'],
+    profit: parseFloat(data['pr']),
+    swap  : parseFloat(data['sw']),
+    commission: parseFloat(data['co']),
+    openPrice: parseFloat(data['op']),
+    openTime: new Date(data['ot']),
+    closePrice: parseFloat(data['cp']),
+    closeTime: new Date(data['ct']),
+    expiration: new Date(data['ex']),
     symbol: data['sy'],
-    lots: data['lo'],
-    stopLoss: data['sl'],
-    takeProfit: data['tp'],
-    ticket: data['ti'],
+    lots: parseFloat(data['lo']),
+    stopLoss: parseFloat(data['sl']),
+    takeProfit: parseFloat(data['tp']),
+    ticket: parseInt(data['ti']),
     type: data['ty'],
-    balance: data['ba'],
-    accountNumber: data['an']
+    balance: parseFloat(data['ba']),
+    accountNumber: parseInt(data['an'])
   }
   return datastore.save({
     key: datastore.key('FxData'),
