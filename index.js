@@ -1,6 +1,6 @@
 const NOT_FOUND = 404;
 const OK = 200;
-const URL = "";
+const URL = "https://hooks.slack.com/services/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";
 
 exports.auth = function auth(req, res) {
     var AccountNumber = parseInt(req.body['an']);
@@ -79,7 +79,8 @@ function saveEntity(data) {
     ticket: parseInt(data['ti']),
     type: data['ty'],
     balance: parseFloat(data['ba']),
-    accountNumber: parseInt(data['an'])
+    accountNumber: parseInt(data['an']),
+    period: data['pe']
   }
   return datastore.save({
     key: datastore.key('FxData'),

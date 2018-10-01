@@ -7,4 +7,5 @@ indexes:
   - name: openTime
   - name: closeTime
   - name: symbol
+  - name: period
     direction: desc
