@@ -3,9 +3,8 @@ indexes:
 - kind: FxData
   properties:
   - name: accountNumber
-  - name: ticket
+    direction: desc
   - name: openTime
-  - name: closeTime
-  - name: symbol
-  - name: period
+    direction: desc
+  - name: ticket
     direction: desc

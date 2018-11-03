@@ -33,7 +33,10 @@ exports.slack = function slack(req, res) {
       var NowYMD = getNowYMD();
       var request = require('request');
       var url = URL;
-      var text = "["+NowYMD+"]:"+entity[0][0]['Name']+"\n"+parseFloat(profit);
+      var text = "["+NowYMD+"]:"+entity[0][0]['Name']+"\n"+
+      "```symbol: "+req.body['sy']+", period: "+req.body['pe']+"\n"+
+      "profit: "+parseFloat(profit)+", swap: "+parseFloat(req.body['sw'])+"\n"+
+      "opentime: "+req.body['ot']+", closetime: "+req.body['ct']+"```";
       var options = {
         uri: url,
         headers: {
